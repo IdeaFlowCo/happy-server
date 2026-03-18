@@ -21,6 +21,7 @@ import { enableAuthentication } from "./utils/enableAuthentication";
 import { userRoutes } from "./routes/userRoutes";
 import { feedRoutes } from "./routes/feedRoutes";
 import { kvRoutes } from "./routes/kvRoutes";
+import { adminRoutes } from "./routes/adminRoutes";
 
 export async function startApi() {
 
@@ -52,6 +53,7 @@ export async function startApi() {
     enableAuthentication(typed);
 
     // Routes
+    adminRoutes(typed);
     authRoutes(typed);
     pushRoutes(typed);
     sessionRoutes(typed);
