@@ -1,6 +1,6 @@
 import { buildNewMessageUpdate, eventRouter } from "@/app/events/eventRouter";
 import { db } from "@/storage/db";
-import { allocateSessionSeqBatch, allocateUserSeq } from "@/storage/seq";
+import { allocateSessionSeq, allocateUserSeq } from "@/storage/seq";
 import { randomKeyNaked } from "@/utils/randomKeyNaked";
 import { z } from "zod";
 import { type Fastify } from "../types";
@@ -158,15 +158,14 @@ export function v3SessionRoutes(app: Fastify) {
             }
 
             const newMessages = uniqueMessages.filter((message) => !existingByLocalId.has(message.localId));
-            const seqs = await allocateSessionSeqBatch(sessionId, newMessages.length, tx);
-
             const createdMessages: Omit<SelectedMessage, 'content'>[] = [];
             for (let i = 0; i < newMessages.length; i += 1) {
                 const message = newMessages[i];
+                const seq = await allocateSessionSeq(sessionId);
                 const createdMessage = await tx.sessionMessage.create({
                     data: {
                         sessionId,
-                        seq: seqs[i],
+                        seq,
                         content: {
                             t: 'encrypted',
                             c: message.content
